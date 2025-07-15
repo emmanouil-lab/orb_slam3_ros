@@ -62,8 +62,8 @@ int main(int argc, char **argv)
     bool enable_pangolin;
     node_handler.param<bool>(node_name + "/enable_pangolin", enable_pangolin, true);
 
-    node_handler.param<std::string>(node_name + "/world_frame_id", world_frame_id, "map");
-    node_handler.param<std::string>(node_name + "/cam_frame_id", cam_frame_id, "camera");
+    node_handler.param<std::string>(node_name + "/world_frame_id", world_frame_id, "world");
+    node_handler.param<std::string>(node_name + "/cam_frame_id", cam_frame_id, "camera_link");
     node_handler.param<std::string>(node_name + "/imu_frame_id", imu_frame_id, "imu");
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.

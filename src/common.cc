@@ -201,7 +201,7 @@ void publish_keypoints(std::vector<ORB_SLAM3::MapPoint*> tracked_map_points, std
 
 
     // Create a blank image. Adjust dimensions as per your requirement.
-    //int width = 640;  // Assuming a standard 640x480 size. Change as needed.
+    //int width = 640;  // Assuming a standard 640x480 size. Change as needed
     //int height = 480;
     //cv::Mat blankImg = cv::Mat::zeros(height, width, CV_8UC3);  // Black image
 
@@ -397,3 +397,4 @@ tf::Transform SE3f_to_tfTransform(Sophus::SE3f T_SE3f)
 
     return tf::Transform(R_tf, t_tf);
 }
+

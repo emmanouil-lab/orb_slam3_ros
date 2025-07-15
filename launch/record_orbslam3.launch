@@ -1,0 +1,48 @@
+<launch>
+  <param name="use_sim_time" value="false" />
+
+  <!-- Start the RealSense D455 Camera -->
+  <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <arg name="enable_color" value="true"/>
+    <arg name="enable_depth" value="false"/> 
+    <arg name="enable_gyro" value="true"/>
+    <arg name="enable_accel" value="true"/>
+    <arg name="unite_imu_method" value="linear_interpolation"/>
+    <arg name="align_depth" value="false"/>
+    <arg name="color_fps" value="30"/>
+    <arg name="color_width" value="640"/>
+    <arg name="color_height" value="480"/>
+  </include>
+
+  <!-- ORB-SLAM3 Node -->
+  <node name="orb_slam3" pkg="orb_slam3_ros" type="ros_mono_inertial" output="screen">
+    <remap from="/camera/image_raw" to="/camera/color/image_raw"/>
+    <remap from="/imu" to="/camera/imu"/>
+
+    <param name="load_calibration_from_cam" type="bool" value="false"/>
+
+    <param name="voc_file"      type="string" value="$(find orb_slam3_ros)/orb_slam3/Vocabulary/ORBvoc.txt.bin"/>
+    <param name="settings_file" type="string" value="$(find orb_slam3_ros)/config/Monocular-Inertial/RealSense_D455.yaml"/>
+
+    <param name="world_frame_id" type="string" value="world"/>
+    <param name="cam_frame_id" type="string" value="camera_link"/>
+    <param name="imu_frame_id" type="string" value="imu"/>
+
+    <param name="enable_pangolin"   type="bool"   value="false" />
+  </node>
+
+  <!-- ROSBAG Record -->
+  <node pkg="rosbag" type="record" name="record_slam3_topics" output="screen"
+        args="-O $(env HOME)/IGLOV/record_video/camera_imu9.bag
+              /camera/color/image_raw
+              /camera/imu
+              /tf
+              /tf_static  
+              /orb_slam3/camera_pose
+              /orb_slam3/all_points" />
+
+  <!-- RViz -->
+  <node name="rviz" pkg="rviz" type="rviz" output="screen"
+        args="-d $(find orb_slam3_ros)/config/orb_slam3_with_imu.rviz" />
+</launch>
+

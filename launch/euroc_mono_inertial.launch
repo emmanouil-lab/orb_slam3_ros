@@ -1,31 +1,45 @@
 <launch>
-    <param name="use_sim_time" value="false" />
 
-    <!-- Main node -->
+    <param name="use_sim_time" value="true" />
+
     <node name="orb_slam3" pkg="orb_slam3_ros" type="ros_mono_inertial" output="screen">
-        <!-- change the topics according to the dataset -->
-        <remap from="/camera/image_raw"     to="/cam0/image_raw"/>
-        <remap from="/imu"                  to="/imu0"/>
+        <remap from="/camera/image_raw" to="/camera/color/image_raw"/>
+        <remap from="/imu" to="/camera/imu"/>
 
-        <!-- Parameters for original ORB-SLAM3 -->
         <param name="voc_file"      type="string" value="$(find orb_slam3_ros)/orb_slam3/Vocabulary/ORBvoc.txt.bin"/>
-        <param name="settings_file" type="string" value="$(find orb_slam3_ros)/config/Monocular-Inertial/EuRoC.yaml"/>
+        <param name="settings_file" type="string" value="$(find orb_slam3_ros)/config/Monocular-Inertial/RealSense_D455.yaml"/>
 
-        <!-- Parameters for ROS -->
-        <param name="world_frame_id"    type="string"   value="world" />
-        <param name="cam_frame_id"      type="string"   value="camera" />
-        <param name="imu_frame_id"      type="string"   value="imu" />
-        <param name="enable_pangolin"   type="bool"     value="true" />
+        <param name="world_frame_id" type="string" value="world"/>
+        <param name="cam_frame_id" type="string" value="camera_link"/>
+        <param name="imu_frame_id" type="string" value="imu"/>
+        <param name="enable_pangolin" type="bool" value="false"/>
     </node>
-    
+
+
+
+  
+    <node pkg="view_planning" type="view_planning_node" name="view_planning_node" output="screen">
+      <remap from="/orb_slam2_rgbd/pose" to="/orb_slam3/camera_pose"/>
+      <remap from="/orb_slam2_rgbd/map_points" to="/orb_slam3/all_points"/>
+    </node>
+
+    <node pkg="gimbal_controller" type="gimbal_controller_node" name="gimbal_controller_node" output="screen"/>
+      
+     <!-- 
+    <node pkg="rosbag" type="play" name="play_bag" output="screen"
+        args="-clock $(env HOME)/IGLOV/record_video/camera_imu9.bag /camera/color/image_raw /camera/imu" /> -->
+
+
     <!-- Visualization -->
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find orb_slam3_ros)/config/orb_slam3_with_imu.rviz" output="screen" />
-    
+
     <!-- Trajectory path -->
-    <node pkg="hector_trajectory_server" type="hector_trajectory_server" name="trajectory_server_orb_slam3" output="screen" ns="orb_slam3_ros" >
+    <node pkg="hector_trajectory_server" type="hector_trajectory_server" name="trajectory_server_orb_slam3" output="screen" ns="orb_slam3_ros">
         <param name="/target_frame_name" value="/world" />
-        <param name="/source_frame_name" value="/imu" />
+        <param name="/source_frame_name" value="/camera_link" />
         <param name="/trajectory_update_rate" value="20.0" />
         <param name="/trajectory_publish_rate" value="20.0" />
     </node>
+
 </launch>
+
